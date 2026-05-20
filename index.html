@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VRPF – Your Wealth, Our Expertise</title>
-  <meta name="description" content="Personalised financial planning and proactive wealth management. SEBI-registered, fee-only advisory." />
+  <meta name="description" content="Personalised financial planning and proactive wealth management. NISM Certified Investment Advisors, fee-only advisory." />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -30,6 +30,11 @@
     .faq-answer.open { max-height: 400px; }
     .faq-icon { transition: transform 0.25s ease; }
     .faq-item.open .faq-icon { transform: rotate(180deg); }
+    .prose h2 { font-size: 1.5rem; font-weight: 700; margin-top: 2em; margin-bottom: 1em; }
+    .prose h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.5em; margin-bottom: 0.75em; }
+    .prose p, .prose li { color: #475569; }
+    .prose ul { list-style-type: disc; padding-left: 1.5rem; }
+    .prose strong { font-weight: 600; color: #1e293b; }
   </style>
 </head>
 <body class="bg-white text-slate-900 antialiased">
@@ -39,9 +44,7 @@
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
       <a href="#home" class="flex items-center gap-2">
-        <div class="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center">
-          <span class="text-white font-bold text-sm">VR</span>
-        </div>
+        <img src="Assets/vrpf logo.jpg" alt="VRPF Logo" class="w-8 h-8 rounded-lg" />
         <span class="font-bold text-slate-900 text-lg">VRPF</span>
       </a>
 
@@ -51,7 +54,7 @@
         <a href="#opportunity" class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Why Us</a>
         <a href="#testimonials" class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Testimonials</a>
         <a href="#faq" class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">FAQ</a>
-        <a href="#contact" class="bg-teal-600 hover:bg-teal-700 text-white text-sm px-5 py-2 rounded-full font-medium transition-colors shadow-sm">
+        <a href="https://calendly.com/vrpersonalfinance/book-a-call-with-our-consultant" target="_blank" rel="noopener noreferrer" class="bg-teal-600 hover:bg-teal-700 text-white text-sm px-5 py-2 rounded-full font-medium transition-colors shadow-sm">
           Book a Call
         </a>
       </div>
@@ -69,7 +72,7 @@
       <a href="#opportunity" onclick="closeMenu()" class="block px-3 py-2.5 text-slate-700 hover:bg-slate-50 rounded-lg text-sm font-medium">Why Us</a>
       <a href="#testimonials" onclick="closeMenu()" class="block px-3 py-2.5 text-slate-700 hover:bg-slate-50 rounded-lg text-sm font-medium">Testimonials</a>
       <a href="#faq" onclick="closeMenu()" class="block px-3 py-2.5 text-slate-700 hover:bg-slate-50 rounded-lg text-sm font-medium">FAQ</a>
-      <a href="#contact" onclick="closeMenu()" class="block px-3 py-2.5 bg-teal-600 text-white rounded-lg text-sm font-medium mt-2">Book a Call</a>
+      <a href="https://calendly.com/vrpersonalfinance/book-a-call-with-our-consultant" target="_blank" rel="noopener noreferrer" onclick="closeMenu()" class="block px-3 py-2.5 bg-teal-600 text-white rounded-lg text-sm font-medium mt-2">Book a Call</a>
     </div>
   </div>
 </nav>
@@ -84,7 +87,7 @@
     <div class="max-w-3xl">
       <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-sm font-medium mb-8">
         <span class="w-2 h-2 rounded-full bg-teal-500 pulse-dot"></span>
-        SEBI Registered · Fee-Only Advisory
+        Personal finance made easy
       </div>
 
       <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold text-slate-900 leading-tight mb-6">
@@ -97,7 +100,7 @@
       </p>
 
       <div class="flex flex-wrap gap-4">
-        <a href="#contact" class="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-8 py-4 rounded-full font-semibold transition-all shadow-lg text-base" style="box-shadow:0 10px 30px rgba(20,184,166,0.2)">
+        <a href="https://calendly.com/vrpersonalfinance/book-a-call-with-our-consultant" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-8 py-4 rounded-full font-semibold transition-all shadow-lg text-base" style="box-shadow:0 10px 30px rgba(20,184,166,0.2)">
           Book a Free Call
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </a>
@@ -108,34 +111,27 @@
     </div>
 
     <!-- Stats -->
-    <div class="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6">
+    <div class="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl">
       <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow fade-in">
         <div class="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center mb-3">
           <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         </div>
-        <p class="text-3xl font-bold text-slate-900 mb-1">500+</p>
+        <p class="text-3xl font-bold text-slate-900 mb-1">100+</p>
         <p class="text-sm text-slate-500 font-medium">Happy Clients</p>
-      </div>
-      <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow fade-in">
-        <div class="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center mb-3">
-          <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-        </div>
-        <p class="text-3xl font-bold text-slate-900 mb-1">₹100Cr+</p>
-        <p class="text-sm text-slate-500 font-medium">Assets Managed</p>
       </div>
       <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow fade-in">
         <div class="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center mb-3">
           <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
         </div>
-        <p class="text-3xl font-bold text-slate-900 mb-1">15+</p>
-        <p class="text-sm text-slate-500 font-medium">Years Experience</p>
+        <p class="text-3xl font-bold text-slate-900 mb-1">10+</p>
+        <p class="text-sm text-slate-500 font-medium">Combined Experience</p>
       </div>
       <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow fade-in">
         <div class="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center mb-3">
-          <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
-        <p class="text-3xl font-bold text-slate-900 mb-1">98%</p>
-        <p class="text-sm text-slate-500 font-medium">Client Retention</p>
+        <p class="text-2xl font-bold text-slate-900 mb-1">NISM Certified</p>
+        <p class="text-sm text-slate-500 font-medium">Investment Advisors</p>
       </div>
     </div>
   </div>
@@ -163,7 +159,7 @@
           <li class="flex items-start gap-3 text-slate-500 text-sm"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-teal-500 flex-shrink-0"></span>Setting short & long-term goals</li>
           <li class="flex items-start gap-3 text-slate-500 text-sm"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-teal-500 flex-shrink-0"></span>Making a personalised financial plan</li>
         </ul>
-        <a href="#contact" class="flex items-center gap-1.5 text-teal-600 text-sm font-semibold hover:text-teal-700 transition-colors">
+        <a href="https://calendly.com/vrpersonalfinance/book-a-call-with-our-consultant" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 text-teal-600 text-sm font-semibold hover:text-teal-700 transition-colors">
           Get Started <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </a>
       </div>
@@ -177,7 +173,7 @@
           <li class="flex items-start gap-3 text-slate-500 text-sm"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-teal-500 flex-shrink-0"></span>Portfolio funds aligned to specific goals</li>
           <li class="flex items-start gap-3 text-slate-500 text-sm"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-teal-500 flex-shrink-0"></span>Diversify your portfolio for best results</li>
         </ul>
-        <a href="#contact" class="flex items-center gap-1.5 text-teal-600 text-sm font-semibold hover:text-teal-700 transition-colors">
+        <a href="https://calendly.com/vrpersonalfinance/book-a-call-with-our-consultant" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 text-teal-600 text-sm font-semibold hover:text-teal-700 transition-colors">
           Get Started <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </a>
       </div>
@@ -191,7 +187,7 @@
           <li class="flex items-start gap-3 text-slate-500 text-sm"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-teal-500 flex-shrink-0"></span>Is mutual fund the best choice for you?</li>
           <li class="flex items-start gap-3 text-slate-500 text-sm"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-teal-500 flex-shrink-0"></span>Making the most of tax-advantaged accounts</li>
         </ul>
-        <a href="#contact" class="flex items-center gap-1.5 text-teal-600 text-sm font-semibold hover:text-teal-700 transition-colors">
+        <a href="https://calendly.com/vrpersonalfinance/book-a-call-with-our-consultant" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 text-teal-600 text-sm font-semibold hover:text-teal-700 transition-colors">
           Get Started <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </a>
       </div>
@@ -290,35 +286,45 @@
       <h2 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4">What our clients say</h2>
       <p class="text-slate-500 text-lg max-w-xl mx-auto">Real stories from real clients who transformed their financial futures with VRPF.</p>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
       <div class="bg-white rounded-2xl p-8 border border-slate-100 hover:shadow-md transition-shadow flex flex-col fade-in">
         <svg class="w-8 h-8 text-teal-100 mb-4" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
         <div class="flex mb-4 text-amber-400">★★★★★</div>
-        <p class="text-slate-600 text-sm leading-relaxed flex-1 mb-8">"I had no idea where to start with investing. VRPF not only helped me create a solid plan but also educated me at every step. In 2 years, my portfolio has grown beyond what I imagined. I feel genuinely in control of my finances now."</p>
+        <p class="text-slate-600 text-sm leading-relaxed flex-1 mb-8">"The greatest relief for me is that I no longer need to dedicate time to something I barely understood. The extensive research, effort, and time I used to invest in managing my finances can now be redirected toward activities I truly enjoy."</p>
         <div class="flex items-center gap-3 pt-6 border-t border-slate-50">
-          <div class="w-10 h-10 bg-teal-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">PS</div>
-          <div><p class="font-semibold text-slate-900 text-sm">Prachi Sharma</p><p class="text-slate-400 text-xs">Software Engineer, Bangalore</p></div>
+          <div class="w-10 h-10 bg-teal-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">IM</div>
+          <div><p class="font-semibold text-slate-900 text-sm">Ishika Malhotra</p><p class="text-slate-400 text-xs">Product Designer</p></div>
         </div>
       </div>
 
       <div class="bg-white rounded-2xl p-8 border border-slate-100 hover:shadow-md transition-shadow flex flex-col fade-in">
         <svg class="w-8 h-8 text-teal-100 mb-4" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
         <div class="flex mb-4 text-amber-400">★★★★★</div>
-        <p class="text-slate-600 text-sm leading-relaxed flex-1 mb-8">"As a business owner, I was always too busy to think about personal wealth management. VRPF handles everything proactively — they even called me before the market dip to rebalance my portfolio. The ROI has been exceptional."</p>
+        <p class="text-slate-600 text-sm leading-relaxed flex-1 mb-8">"Tax planning and saving have become significantly easier and more streamlined. They have introduced innovative strategies I was previously unaware of, which have made wealth creation far more efficient."</p>
         <div class="flex items-center gap-3 pt-6 border-t border-slate-50">
-          <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">SR</div>
-          <div><p class="font-semibold text-slate-900 text-sm">Sai Prasad Reddy</p><p class="text-slate-400 text-xs">Business Owner, Hyderabad</p></div>
+          <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">PC</div>
+          <div><p class="font-semibold text-slate-900 text-sm">Praful Chauhan</p><p class="text-slate-400 text-xs">COO Shoogloo group</p></div>
         </div>
       </div>
 
       <div class="bg-white rounded-2xl p-8 border border-slate-100 hover:shadow-md transition-shadow flex flex-col fade-in">
         <svg class="w-8 h-8 text-teal-100 mb-4" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
-        <div class="flex mb-4 text-amber-400">★★★★★</div>
-        <p class="text-slate-600 text-sm leading-relaxed flex-1 mb-8">"Coming from a medical background, finance was a mystery to me. VRPF made everything simple and transparent. No jargon, no hidden fees, and my retirement plan is now fully on track. Best financial decision I've made."</p>
+        <div class="flex mb-4 text-amber-400">★★★★<span class="text-slate-200">★</span></div>
+        <p class="text-slate-600 text-sm leading-relaxed flex-1 mb-8">"Before VRPF, I struggled to save due to a lack of structure and overspending. With their help, I gained control, managed my finances better, saved consistently, and grew my savings impressively."</p>
         <div class="flex items-center gap-3 pt-6 border-t border-slate-50">
-          <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">MA</div>
-          <div><p class="font-semibold text-slate-900 text-sm">Mayank Agarwal</p><p class="text-slate-400 text-xs">Doctor, Mumbai</p></div>
+          <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">M</div>
+          <div><p class="font-semibold text-slate-900 text-sm">Mayank</p><p class="text-slate-400 text-xs">SDE Amazon</p></div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-8 border border-slate-100 hover:shadow-md transition-shadow flex flex-col fade-in">
+        <svg class="w-8 h-8 text-teal-100 mb-4" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+        <div class="flex mb-4 text-amber-400">★★★★<span class="text-slate-200">★</span></div>
+        <p class="text-slate-600 text-sm leading-relaxed flex-1 mb-8">"They have provided invaluable support in keeping me on track to retire at my desired age. Their consultation has significantly increased my confidence in my saving strategies and financial planning."</p>
+        <div class="flex items-center gap-3 pt-6 border-t border-slate-50">
+          <div class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">D</div>
+          <div><p class="font-semibold text-slate-900 text-sm">Dushyant</p><p class="text-slate-400 text-xs">Engineer, Micron</p></div>
         </div>
       </div>
 
@@ -350,7 +356,7 @@
       Ready to go from <span class="text-teal-400">0 investments</span> to creating generational wealth?
     </h2>
     <p class="text-slate-400 text-lg mb-10 max-w-xl mx-auto">Book your free consultation today and take the first step toward financial freedom.</p>
-    <a href="#contact" class="inline-flex items-center gap-2 bg-teal-500 hover:bg-teal-400 text-white px-10 py-4 rounded-full font-bold transition-all text-lg" style="box-shadow:0 20px 40px rgba(0,0,0,0.3)">
+    <a href="https://calendly.com/vrpersonalfinance/book-a-call-with-our-consultant" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-teal-500 hover:bg-teal-400 text-white px-10 py-4 rounded-full font-bold transition-all text-lg" style="box-shadow:0 20px 40px rgba(0,0,0,0.3)">
       Book a Call
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
     </a>
@@ -360,7 +366,7 @@
 <!-- ── CONTACT FORM ── -->
 <section id="contact" class="py-24 bg-slate-50">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+    <div class="max-w-2xl mx-auto items-start">
       <div class="fade-in">
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-sm font-medium mb-6">
           <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>Free Consultation
@@ -370,47 +376,22 @@
         <div class="space-y-3 mb-10">
           <div class="flex items-start gap-3"><svg class="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span class="text-slate-700 text-sm">Free initial consultation — no strings attached</span></div>
           <div class="flex items-start gap-3"><svg class="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span class="text-slate-700 text-sm">Personalised financial roadmap within 7 days</span></div>
-          <div class="flex items-start gap-3"><svg class="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span class="text-slate-700 text-sm">SEBI-registered, conflict-free advice</span></div>
+          <div class="flex items-start gap-3"><svg class="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span class="text-slate-700 text-sm">NISM Certified Investment Advisors, conflict-free advice</span></div>
           <div class="flex items-start gap-3"><svg class="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span class="text-slate-700 text-sm">Ongoing support and quarterly reviews</span></div>
         </div>
         <div class="space-y-4 pt-8 border-t border-slate-200">
           <div class="flex items-center gap-3 text-slate-500 text-sm">
             <div class="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg></div>
-            <span>+91 98765 43210</span>
+            <a href="tel:+919056005257" class="hover:text-teal-600 transition-colors">+91 9056005257</a>
           </div>
           <div class="flex items-center gap-3 text-slate-500 text-sm">
             <div class="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>
-            <span>hello@vrpfinancials.com</span>
+            <a href="mailto:vrpersonalfinance@gmail.com" class="hover:text-teal-600 transition-colors">vrpersonalfinance@gmail.com</a>
           </div>
           <div class="flex items-center gap-3 text-slate-500 text-sm">
             <div class="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
-            <span>Mumbai, Maharashtra, India</span>
+            <span>#92, 1st floor, sector 5, eco city 1, New chandigarh, 140901</span>
           </div>
-        </div>
-      </div>
-
-      <div class="bg-white border border-slate-100 rounded-2xl p-8 shadow-sm fade-in">
-        <div id="contact-success" class="hidden text-center py-12">
-          <div class="w-20 h-20 rounded-full bg-teal-50 flex items-center justify-center mx-auto mb-6">
-            <svg class="w-10 h-10 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          </div>
-          <h4 class="text-2xl font-bold text-slate-900 mb-2">Request Received!</h4>
-          <p class="text-slate-500">We'll be in touch within 24 hours to schedule your free consultation.</p>
-        </div>
-        <div id="contact-form-wrapper">
-          <h3 class="text-xl font-bold text-slate-900 mb-1.5">Book a Free Call</h3>
-          <p class="text-slate-500 text-sm mb-7">Fill in your details and we'll reach out to confirm your slot.</p>
-          <form onsubmit="submitContact(event)" class="space-y-4">
-            <div><label class="block text-sm font-medium text-slate-700 mb-1.5">Full Name</label><input type="text" required placeholder="Rajesh Kumar" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-teal-400 transition-all"/></div>
-            <div><label class="block text-sm font-medium text-slate-700 mb-1.5">Email Address</label><input type="email" required placeholder="rajesh@example.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-teal-400 transition-all"/></div>
-            <div><label class="block text-sm font-medium text-slate-700 mb-1.5">WhatsApp / Phone</label><input type="tel" required placeholder="+91 98765 43210" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-teal-400 transition-all"/></div>
-            <div><label class="block text-sm font-medium text-slate-700 mb-1.5">What are your main financial goals?</label><textarea rows="3" placeholder="e.g. Plan for retirement, grow my investments, manage debt..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-teal-400 transition-all resize-none"></textarea></div>
-            <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 rounded-xl transition-colors flex items-center justify-center gap-2">
-              Book My Free Consultation
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-            </button>
-            <p class="text-xs text-center text-slate-400">By submitting, you agree to our Privacy Policy & Terms of Service.</p>
-          </form>
         </div>
       </div>
     </div>
@@ -423,21 +404,10 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
       <div class="md:col-span-2">
         <div class="flex items-center gap-2 mb-4">
-          <div class="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center"><span class="text-white font-bold text-sm">VR</span></div>
+          <img src="Assets/vrpf logo.jpg" alt="VRPF Logo" class="w-8 h-8 rounded-lg" />
           <span class="font-bold text-white text-lg">VRPF</span>
         </div>
-        <p class="text-slate-400 text-sm leading-relaxed mb-6 max-w-xs">Your trusted partner for personalised financial planning and proactive wealth management. SEBI-registered, conflict-free advice you can count on.</p>
-        <div class="flex gap-3">
-          <a href="#" class="w-9 h-9 bg-slate-800 hover:bg-teal-600 rounded-lg flex items-center justify-center transition-colors" aria-label="LinkedIn">
-            <svg class="w-4 h-4 text-slate-300" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-          </a>
-          <a href="#" class="w-9 h-9 bg-slate-800 hover:bg-teal-600 rounded-lg flex items-center justify-center transition-colors" aria-label="Twitter">
-            <svg class="w-4 h-4 text-slate-300" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
-          </a>
-          <a href="#" class="w-9 h-9 bg-slate-800 hover:bg-teal-600 rounded-lg flex items-center justify-center transition-colors" aria-label="Instagram">
-            <svg class="w-4 h-4 text-slate-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-          </a>
-        </div>
+        <p class="text-slate-400 text-sm leading-relaxed mb-6 max-w-xs">Your trusted partner for personalised financial planning and proactive wealth management. NISM Certified Investment Advisors, conflict-free advice you can count on.</p>
       </div>
       <div>
         <h4 class="text-white font-semibold text-sm mb-4">Services</h4>
@@ -452,16 +422,15 @@
       <div>
         <h4 class="text-white font-semibold text-sm mb-4">Company</h4>
         <ul class="space-y-2.5 text-sm">
-          <li><a href="#" class="hover:text-white transition-colors">About Us</a></li>
-          <li><a href="#" class="hover:text-white transition-colors">Our Team</a></li>
           <li><a href="#contact" class="hover:text-white transition-colors">Contact</a></li>
           <li><a href="https://vrfinanceducators.in/" target="_blank" class="hover:text-white transition-colors">VRFE</a></li>
+          <li><a href="privacy-policy.html" class="hover:text-white transition-colors">Privacy Policy</a></li>
+          <li><a href="terms-and-conditions.html" class="hover:text-white transition-colors">Terms & Conditions</a></li>
         </ul>
       </div>
     </div>
     <div class="pt-8 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
       <p class="text-slate-500 text-sm">© 2025 VRPF Financials. All rights reserved.</p>
-      <p class="text-slate-600 text-xs">SEBI Registered Investment Advisor · INA000000000</p>
     </div>
   </div>
 </footer>
@@ -541,11 +510,6 @@
   }
 
   // ── CONTACT FORM ──
-  function submitContact(e) {
-    e.preventDefault();
-    document.getElementById('contact-form-wrapper').classList.add('hidden');
-    document.getElementById('contact-success').classList.remove('hidden');
-  }
 
   // ── CHARTS ──
   window.addEventListener('load', () => {
