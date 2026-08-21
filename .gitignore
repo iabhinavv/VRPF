@@ -1,0 +1,5 @@
+# Never publish client-identifying files
+*.xlsx
+tokens.json
+client-links.csv
+.DS_Store

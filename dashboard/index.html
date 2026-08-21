@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Client Dashboard – VRPF</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { font-family: 'Inter', system-ui, sans-serif; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .fade-in { opacity: 0; transform: translateY(12px); animation: fadeInUp .5s ease forwards; }
+    @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #fff; }
+      section { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased">
+
+<!-- ── NAV ── -->
+<nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-sm border-b border-slate-100">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+    <a href="https://vrpersonalfinance.in" class="flex items-center gap-2">
+      <img src="../Assets/vrpf logo.jpg" alt="VRPF" class="w-8 h-8 rounded-lg" />
+      <span class="font-bold text-lg">VRPF</span>
+      <span class="hidden sm:inline text-sm text-slate-400 font-medium border-l border-slate-200 pl-2 ml-1">Client Dashboard</span>
+    </a>
+    <div id="nav-meta" class="hidden items-center gap-3">
+      <span id="nav-code" class="text-sm font-semibold text-teal-700 bg-teal-50 border border-teal-200 px-3 py-1 rounded-full"></span>
+      <button onclick="window.print()" class="no-print hidden sm:inline-flex text-sm font-medium text-slate-500 hover:text-slate-900">Print</button>
+      <button onclick="signOut()" class="no-print text-sm font-medium text-slate-500 hover:text-slate-900">Exit</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── GATE ── -->
+<section id="gate" class="min-h-[85vh] flex items-center justify-center px-4 relative overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-br from-teal-50 via-white to-slate-50 -z-10"></div>
+  <div class="absolute top-0 right-0 w-[420px] h-[420px] bg-teal-100/40 rounded-full blur-3xl -z-10"></div>
+  <div class="w-full max-w-md bg-white rounded-2xl border border-slate-100 shadow-sm p-8 fade-in">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-xs font-medium mb-6">
+      <span class="w-2 h-2 rounded-full bg-teal-500"></span> Secure client access
+    </div>
+    <h1 class="text-2xl font-bold mb-2">Your financial plan</h1>
+    <p class="text-slate-500 text-sm mb-6 leading-relaxed">Enter the access code from your advisor's email. It opens only your own plan — nothing else.</p>
+    <form onsubmit="event.preventDefault(); openCode(document.getElementById('code-input').value);">
+      <label for="code-input" class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Access code</label>
+      <input id="code-input" autocomplete="off" spellcheck="false" placeholder="CC001-xxxxxxxxxx"
+             class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none text-sm mb-3" />
+      <p id="gate-error" class="hidden text-sm text-rose-600 mb-3"></p>
+      <button class="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-full font-semibold transition-colors shadow-lg" style="box-shadow:0 10px 30px rgba(20,184,166,.2)">
+        View my dashboard
+      </button>
+    </form>
+    <p class="text-xs text-slate-400 mt-6 leading-relaxed">Lost your code? Reply to your advisor's email and we'll resend it.</p>
+  </div>
+</section>
+
+<!-- ── DASHBOARD ── -->
+<main id="app" class="hidden max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10"></main>
+
+<footer id="footer" class="hidden border-t border-slate-100 bg-white mt-16">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-xs text-slate-400 leading-relaxed">
+    <p class="mb-2">This dashboard is prepared for a single VRPF client and reflects information as of the date shown. Figures are indicative and based on the details you shared with us; projections assume 6% inflation, 8% post-retirement returns and 10% pre-retirement returns.</p>
+    <p>© <span id="year"></span> VR Personal Finance · <a href="https://vrpersonalfinance.in/privacy-policy.html" class="hover:text-slate-600 underline">Privacy</a> · <a href="https://vrpersonalfinance.in/terms-and-conditions.html" class="hover:text-slate-600 underline">Terms</a></p>
+  </div>
+</footer>
+
+<script>
+// ── formatting ────────────────────────────────────────────────────────────
+const inr = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+const money = n => inr.format(Math.round(Number(n) || 0));
+const pct = n => (Number(n) * 100).toFixed(1) + '%';
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const compact = n => {
+  n = Number(n) || 0;
+  const a = Math.abs(n), sign = n < 0 ? '-' : '';
+  if (a >= 1e7) return sign + '₹' + (a / 1e7).toFixed(2) + ' Cr';
+  if (a >= 1e5) return sign + '₹' + (a / 1e5).toFixed(2) + ' L';
+  return money(n);
+};
+
+const PALETTE = ['#0d9488','#14b8a6','#2dd4bf','#5eead4','#0f766e','#0891b2','#38bdf8','#94a3b8','#f59e0b','#fb7185'];
+const BAND_STYLE = {
+  Conservative: 'bg-sky-50 text-sky-700 border-sky-200',
+  Moderate: 'bg-teal-50 text-teal-700 border-teal-200',
+  Growth: 'bg-amber-50 text-amber-700 border-amber-200',
+  Aggressive: 'bg-rose-50 text-rose-700 border-rose-200'
+};
+const PRIORITY_STYLE = {
+  High: 'bg-rose-50 text-rose-700 border-rose-200',
+  Medium: 'bg-amber-50 text-amber-700 border-amber-200',
+  Low: 'bg-slate-100 text-slate-600 border-slate-200'
+};
+
+// ── building blocks ───────────────────────────────────────────────────────
+const card = (inner, cls = '') =>
+  `<div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 ${cls}">${inner}</div>`;
+
+const section = (title, sub, inner) => `
+  <section class="fade-in">
+    <div class="mb-4">
+      <h2 class="text-xl font-bold">${esc(title)}</h2>
+      ${sub ? `<p class="text-sm text-slate-500 mt-1">${esc(sub)}</p>` : ''}
+    </div>
+    ${inner}
+  </section>`;
+
+const stat = (label, value, note, tone = 'slate') => card(`
+  <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">${esc(label)}</p>
+  <p class="text-2xl sm:text-3xl font-bold text-${tone}-900 mb-1 break-words">${value}</p>
+  ${note ? `<p class="text-sm text-slate-500">${esc(note)}</p>` : ''}`);
+
+function table(headers, rows, aligns = []) {
+  if (!rows.length) return '<p class="text-sm text-slate-400">Nothing recorded yet.</p>';
+  const al = i => aligns[i] === 'r' ? 'text-right' : '';
+  const wide = headers.length > 3 ? 'min-w-[520px]' : '';
+  return `<div class="overflow-x-auto -mx-6 px-6"><table class="w-full text-sm ${wide}">
+    <thead><tr class="border-b border-slate-100">
+      ${headers.map((h, i) => `<th class="py-2 pr-4 text-xs font-semibold uppercase tracking-wide text-slate-400 ${al(i)}">${esc(h)}</th>`).join('')}
+    </tr></thead>
+    <tbody>${rows.map(r => `<tr class="border-b border-slate-50 last:border-0">
+      ${r.map((c, i) => `<td class="py-2.5 pr-4 ${al(i)}">${c}</td>`).join('')}
+    </tr>`).join('')}</tbody></table></div>`;
+}
+
+const chip = (txt, cls) => `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${cls}">${esc(txt)}</span>`;
+
+// ── renderers ─────────────────────────────────────────────────────────────
+function renderSnapshot(d) {
+  const b = d.balance, c = d.cashflow;
+  const surplusTone = c.surplus >= 0 ? 'teal' : 'rose';
+  return `<section class="fade-in">
+    <div class="mb-4">
+      <h1 class="text-2xl sm:text-3xl font-bold">Your financial snapshot</h1>
+      <p class="text-sm text-slate-500 mt-1">Client ${esc(d.code)} · updated ${esc(d.updated || '')}</p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      ${stat('Net worth', compact(b.netWorth), `${money(b.totalAssets)} assets − ${money(b.totalLiabilities)} liabilities`)}
+      ${stat('Monthly surplus', compact(c.surplus), c.surplus >= 0 ? 'Available to invest each month' : 'Spending exceeds income', surplusTone)}
+      ${stat('Monthly income', compact(c.totalIncome), `${money(c.totalExpense)} monthly expenses`)}
+      ${stat('Risk profile', esc(d.risk.band || '—'), `Score ${d.risk.score} of ${d.risk.maxScore}`)}
+    </div>
+  </section>`;
+}
+
+function renderRetirement(d) {
+  const p = d.profile, r = d.retirement;
+  return section('Retirement plan', `Age ${p.age || '—'} today, retiring at ${p.retirementAge || '—'}`, `
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      ${stat('Years to retirement', String(p.yearsToRetirement || 0), 'Time your money has to compound')}
+      ${stat('Corpus needed', compact(r.corpusNeeded), 'To fund expenses to age 75')}
+      ${stat('Monthly saving needed', compact(r.monthlySavingNeeded), 'Starting now, at 10% p.a.')}
+    </div>`);
+}
+
+function renderRatios(d) {
+  const rows = d.ratios.map(r => {
+    const v = r.unit === 'months' ? r.value.toFixed(1) + ' months' : pct(r.value);
+    return [`<span class="font-medium">${esc(r.label)}</span>`, v, esc(r.target),
+      chip(r.ok ? 'On track' : 'Needs attention', r.ok ? 'bg-teal-50 text-teal-700 border-teal-200' : 'bg-amber-50 text-amber-700 border-amber-200')];
+  });
+  return section('Financial health checks', 'How your numbers compare with healthy benchmarks',
+    card(table(['Ratio', 'Your value', 'Healthy range', 'Status'], rows, ['', 'r', '', ''])));
+}
+
+function renderAllocation(d) {
+  const assets = d.balance.assets.filter(a => a.amount > 0);
+  const alloc = d.risk.suggestedAllocation || {};
+  const suggested = Object.keys(alloc).length
+    ? table(['Asset class', 'Suggested allocation'], Object.entries(alloc).map(([k, v]) =>
+        [`<span class="font-medium">${esc(k)}</span>`, esc(v)]))
+    : '<p class="text-sm text-slate-400">Complete the risk questionnaire to see a suggested mix.</p>';
+
+  const chart = assets.length
+    ? `<div class="h-64"><canvas id="alloc-chart"></canvas></div>`
+    : '<p class="text-sm text-slate-400">No holdings recorded yet.</p>';
+
+  return section('Asset allocation', 'Where your money sits today, and where it should sit', `
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      ${card(`<p class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-4">Current holdings</p>${chart}`)}
+      ${card(`<p class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-4">Suggested for a ${esc(d.risk.band || 'balanced')} profile</p>${suggested}`)}
+    </div>`);
+}
+
+function drawAllocation(d) {
+  const assets = d.balance.assets.filter(a => a.amount > 0);
+  const el = document.getElementById('alloc-chart');
+  if (!el || !assets.length) return;
+  new Chart(el, {
+    type: 'doughnut',
+    data: {
+      labels: assets.map(a => a.label),
+      datasets: [{ data: assets.map(a => a.amount), backgroundColor: assets.map((_, i) => PALETTE[i % PALETTE.length]), borderWidth: 2, borderColor: '#fff' }]
+    },
+    options: {
+      maintainAspectRatio: false, cutout: '62%',
+      plugins: {
+        legend: { position: 'right', labels: { boxWidth: 10, boxHeight: 10, font: { size: 11 }, color: '#475569' } },
+        tooltip: { callbacks: { label: ctx => `${ctx.label}: ${money(ctx.parsed)}` } }
+      }
+    }
+  });
+}
+
+function renderRebalance(d) {
+  const rows = d.rebalance.filter(r => r.targetAmount || r.currentAmount).map(r => {
+    const v = r.variance;
+    const tone = Math.abs(v) < 0.02 ? 'text-slate-500' : v > 0 ? 'text-teal-700' : 'text-rose-600';
+    const arrow = Math.abs(v) < 0.02 ? '' : v > 0 ? '▲ ' : '▼ ';
+    return [`<span class="font-medium">${esc(r.label)}</span>`, pct(r.targetPct), pct(r.currentPct),
+      `<span class="${tone} font-medium">${arrow}${pct(Math.abs(v))}</span>`,
+      money(r.targetAmount), money(r.currentAmount), esc(r.action || '—')];
+  });
+  if (!rows.length) return '';
+  return section('Rebalancing plan', 'What to add or trim to reach your target mix',
+    card(table(['Asset class', 'Target %', 'Current %', 'Gap', 'Target ₹', 'Current ₹', 'Action'], rows,
+      ['', 'r', 'r', 'r', 'r', 'r', ''])));
+}
+
+function renderCashflow(d) {
+  const c = d.cashflow;
+  const inc = c.income.filter(i => i.amount);
+  const exp = c.expenses.filter(e => e.amount);
+  const list = (items, total, label, tone) => card(`
+    <div class="flex items-baseline justify-between mb-4">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">${label}</p>
+      <p class="text-lg font-bold text-${tone}-700">${money(total)}</p>
+    </div>
+    ${items.length ? `<div class="space-y-2">${items.map(i => `
+      <div class="flex items-center justify-between text-sm">
+        <span class="text-slate-600">${esc(i.label)}</span>
+        <span class="font-medium tabular-nums">${money(i.amount)}</span>
+      </div>
+      <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        <div class="h-full bg-${tone}-500 rounded-full" style="width:${total ? Math.min(100, i.amount / total * 100) : 0}%"></div>
+      </div>`).join('')}</div>` : '<p class="text-sm text-slate-400">Nothing recorded yet.</p>'}`);
+
+  return section('Monthly cash flow', `${c.surplus >= 0 ? 'You save' : 'You overspend by'} ${money(Math.abs(c.surplus))} every month`, `
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      ${list(inc, c.totalIncome, 'Income', 'teal')}
+      ${list(exp, c.totalExpense, 'Expenses', 'rose')}
+    </div>`);
+}
+
+function renderBalance(d) {
+  const b = d.balance;
+  const assetRows = b.assets.filter(a => a.amount).map(a => [
+    `<span class="font-medium">${esc(a.label)}</span>`,
+    a.bucket ? chip(a.bucket, 'bg-slate-100 text-slate-600 border-slate-200') : '',
+    money(a.amount)]);
+  const liabRows = b.liabilities.filter(l => l.amount).map(l => [
+    `<span class="font-medium">${esc(l.label)}</span>`,
+    l.monthly ? money(l.monthly) : '—',
+    money(l.amount)]);
+
+  return section('Assets & liabilities', `Net worth ${money(b.netWorth)}`, `
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      ${card(`<div class="flex items-baseline justify-between mb-4">
+        <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Assets</p>
+        <p class="text-lg font-bold text-teal-700">${money(b.totalAssets)}</p></div>
+        ${table(['Asset', 'Type', 'Value'], assetRows, ['', '', 'r'])}`)}
+      ${card(`<div class="flex items-baseline justify-between mb-4">
+        <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Liabilities</p>
+        <p class="text-lg font-bold text-rose-700">${money(b.totalLiabilities)}</p></div>
+        ${table(['Liability', 'Monthly', 'Outstanding'], liabRows, ['', 'r', 'r'])}`)}
+    </div>`);
+}
+
+function renderActions(d) {
+  if (!d.actions.length) return '';
+  const rows = d.actions.map(a => [
+    a.priority ? chip(a.priority, PRIORITY_STYLE[a.priority] || PRIORITY_STYLE.Low) : '',
+    `<span class="font-medium">${esc(a.category)}</span>`,
+    esc(a.timeline || '—'),
+    `<span class="text-slate-600">${esc(a.details || '—')}</span>`,
+    a.amount ? money(a.amount) : '—']);
+  return section('Your action plan', 'Agreed next steps, in priority order',
+    card(table(['Priority', 'Focus', 'Timeline', 'What to do', 'Amount'], rows, ['', '', '', '', 'r'])));
+}
+
+function renderRisk(d) {
+  const qs = d.risk.questions.filter(q => q.question);
+  if (!qs.length) return '';
+  const bandCls = BAND_STYLE[d.risk.band] || 'bg-slate-100 text-slate-600 border-slate-200';
+  return section('Risk profile', 'Based on the questionnaire you completed with your advisor', card(`
+    <div class="flex flex-wrap items-center gap-3 mb-6">
+      ${chip(d.risk.band || 'Not assessed', bandCls)}
+      <span class="text-sm text-slate-500">Score ${d.risk.score} of ${d.risk.maxScore}</span>
+      <div class="flex-1 min-w-[140px] h-2 bg-slate-100 rounded-full overflow-hidden">
+        <div class="h-full bg-teal-500 rounded-full" style="width:${d.risk.score / d.risk.maxScore * 100}%"></div>
+      </div>
+    </div>
+    <div class="space-y-3">${qs.map(q => `
+      <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 pb-3 border-b border-slate-50 last:border-0">
+        <span class="text-sm text-slate-600">${esc(q.question)}</span>
+        <span class="text-sm font-medium whitespace-nowrap">${esc(q.answer || '—')}</span>
+      </div>`).join('')}</div>`));
+}
+
+function renderCalendar(d) {
+  const months = d.calendar.filter(m => m.items.length);
+  if (!months.length) return '';
+  return section('Investment calendar', 'Planned deployments through the year', `
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      ${months.map(m => card(`
+        <div class="flex items-baseline justify-between mb-3">
+          <p class="font-semibold">${esc(m.month)}</p>
+          <p class="text-sm font-bold text-teal-700">${money(m.total)}</p>
+        </div>
+        <div class="space-y-2">${m.items.map(i => `
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-slate-600">${esc(i.label)}</span>
+            <span class="font-medium tabular-nums">${money(i.amount)}</span>
+          </div>`).join('')}</div>`)).join('')}
+    </div>`);
+}
+
+function renderNotes(d) {
+  const p = d.profile;
+  const notes = [['Investment objective', p.objective], ['Liquidity needs', p.liquidityNeeds],
+                 ['Tax considerations', p.taxConsiderations], ['Constraints & preferences', p.constraints]]
+                 .filter(([, v]) => v);
+  if (!notes.length) return '';
+  return section('Your mandate', 'The preferences guiding every recommendation', card(`
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">${notes.map(([k, v]) => `
+      <div><p class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1">${esc(k)}</p>
+      <p class="text-sm text-slate-700">${esc(v)}</p></div>`).join('')}</div>`));
+}
+
+// ── boot ──────────────────────────────────────────────────────────────────
+function render(d) {
+  document.getElementById('gate').classList.add('hidden');
+  const app = document.getElementById('app');
+  app.classList.remove('hidden');
+  document.getElementById('footer').classList.remove('hidden');
+  document.getElementById('nav-meta').classList.remove('hidden');
+  document.getElementById('nav-meta').classList.add('flex');
+  document.getElementById('nav-code').textContent = d.code;
+  document.title = `${d.code} · VRPF Dashboard`;
+  app.innerHTML = [
+    renderSnapshot(d), renderRetirement(d), renderRatios(d), renderAllocation(d),
+    renderRebalance(d), renderCashflow(d), renderBalance(d), renderActions(d),
+    renderRisk(d), renderCalendar(d), renderNotes(d)
+  ].join('');
+  drawAllocation(d);
+}
+
+function gateError(msg) {
+  const el = document.getElementById('gate-error');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+async function openCode(codeRaw, quiet) {
+  const code = String(codeRaw || '').trim();
+  if (!code) return gateError('Please enter your access code.');
+  if (!/^[A-Za-z0-9_-]{3,64}$/.test(code)) return gateError('That code does not look right. Check the email from your advisor.');
+  try {
+    const res = await fetch(`d/${code}.json`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('not found');
+    const data = await res.json();
+    localStorage.setItem('vrpf_code', code);
+    history.replaceState(null, '', `?k=${encodeURIComponent(code)}`);
+    render(data);
+  } catch (e) {
+    localStorage.removeItem('vrpf_code');
+    if (!quiet) gateError('We could not find a dashboard for that code. Please check it and try again.');
+  }
+}
+
+function signOut() {
+  localStorage.removeItem('vrpf_code');
+  history.replaceState(null, '', location.pathname);
+  location.reload();
+}
+
+document.getElementById('year').textContent = new Date().getFullYear();
+(function init() {
+  const fromUrl = new URLSearchParams(location.search).get('k');
+  const saved = localStorage.getItem('vrpf_code');
+  if (fromUrl) openCode(fromUrl);
+  else if (saved) openCode(saved, true);
+})();
+</script>
+</body>
+</html>
