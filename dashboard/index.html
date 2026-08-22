@@ -17,6 +17,21 @@
     .fade-in { opacity: 0; transform: translateY(12px); animation: fadeInUp .5s ease forwards; }
     @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
     .chart-box { position: relative; width: 100%; }
+    @media (max-width: 639px) {
+      table.stack, table.stack tbody, table.stack tr, table.stack td { display: block; width: 100%; }
+      table.stack thead { display: none; }
+      table.stack tr { padding: .6rem 0; border-bottom: 1px solid #f1f5f9; }
+      table.stack tr:last-child { border-bottom: 0; }
+      table.stack td { padding: .12rem 0 !important; text-align: left !important; }
+      table.stack td:empty { display: none; }
+      table.stack td:not(:first-child) { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+      table.stack td:not(:first-child)::before {
+        content: attr(data-label); flex: 0 0 auto;
+        color: #94a3b8; font-size: .7rem; font-weight: 600;
+        text-transform: uppercase; letter-spacing: .04em;
+      }
+      table.stack td:first-child { margin-bottom: .35rem; }
+    }
     .chart-box > canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; }
     @media print {
       .no-print { display: none !important; }
@@ -125,15 +140,45 @@ function flushCharts() {
 addEventListener('beforeprint', () => liveCharts.forEach(c => c.resize()));
 
 const GRID = { color: '#f1f5f9', drawTicks: false };
+const tickMoney = v => {
+  const a = Math.abs(Number(v) || 0);
+  if (!isNarrow()) return compact(v);
+  if (a >= 1e7) return '₹' + (v / 1e7).toFixed(1) + 'Cr';
+  if (a >= 1e5) return '₹' + (v / 1e5).toFixed(1) + 'L';
+  if (a >= 1e3) return '₹' + Math.round(v / 1e3) + 'k';
+  return '₹' + Math.round(v);
+};
 const moneyAxis = (extra = {}) => ({
   border: { display: false }, grid: GRID,
-  ticks: { callback: v => compact(v), padding: 6 }, ...extra
+  ticks: { callback: v => tickMoney(v), padding: 4, font: { size: isNarrow() ? 10 : 11 } }, ...extra
 });
 const barAxis = { border: { display: false }, grid: { display: false } };
 const moneyTip = { callbacks: { label: ctx => ` ${ctx.dataset.label ? ctx.dataset.label + ': ' : ''}${money(ctx.parsed.y ?? ctx.parsed.x ?? ctx.parsed)}` } };
+const isNarrow = () => window.innerWidth < 640;
 const legendOpts = (position = 'bottom') => ({
-  position, labels: { boxWidth: 10, boxHeight: 10, usePointStyle: true, pointStyle: 'circle', padding: 16, color: '#475569' }
+  position: isNarrow() ? 'bottom' : position,
+  labels: {
+    boxWidth: 10, boxHeight: 10, usePointStyle: true, pointStyle: 'circle',
+    padding: isNarrow() ? 10 : 16, color: '#475569', font: { size: isNarrow() ? 10 : 11 }
+  }
 });
+const shortLabel = (v, max) => {
+  const s = String(v);
+  return s.length > max ? s.slice(0, max - 1).trimEnd() + '…' : s;
+};
+// Wrap a category name over two short lines rather than cutting it off.
+const wrapLabel = (v, width, maxLines = 2) => {
+  const lines = [];
+  String(v).split(' ').forEach(word => {
+    const last = lines[lines.length - 1];
+    if (last !== undefined && (last + ' ' + word).length <= width) lines[lines.length - 1] = last + ' ' + word;
+    else lines.push(word);
+  });
+  if (lines.length <= maxLines) return lines.map(l => shortLabel(l, width + 2));
+  const kept = lines.slice(0, maxLines);
+  kept[maxLines - 1] = shortLabel(kept[maxLines - 1] + ' ' + lines.slice(maxLines).join(' '), width);
+  return kept;
+};
 
 // Money that can actually be rebalanced: financial assets, not the house.
 const PORTFOLIO_BUCKETS = {
@@ -188,14 +233,14 @@ const stat = (label, value, note, tone = 'slate') => card(`
 
 function table(headers, rows, aligns = []) {
   if (!rows.length) return '<p class="text-sm text-slate-400">Nothing recorded yet.</p>';
-  const al = i => aligns[i] === 'r' ? 'text-right' : 'text-left';
-  const wide = headers.length > 3 ? 'min-w-[520px]' : '';
-  return `<div class="overflow-x-auto -mx-6 px-6"><table class="w-full text-sm ${wide}">
+  const al = i => aligns[i] === 'r' ? 'sm:text-right' : 'text-left';
+  const wide = headers.length > 3 ? 'sm:min-w-[520px]' : '';
+  return `<div class="sm:overflow-x-auto sm:-mx-6 sm:px-6"><table class="stack w-full text-sm ${wide}">
     <thead><tr class="border-b border-slate-100">
       ${headers.map((h, i) => `<th class="py-2 pr-4 text-xs font-semibold uppercase tracking-wide text-slate-400 ${al(i)}">${esc(h)}</th>`).join('')}
     </tr></thead>
     <tbody>${rows.map(r => `<tr class="border-b border-slate-50 last:border-0">
-      ${r.map((c, i) => `<td class="py-2.5 pr-4 ${al(i)}">${c}</td>`).join('')}
+      ${r.map((c, i) => `<td data-label="${esc(headers[i] || '')}" class="py-2.5 sm:pr-4 ${al(i)}">${c}</td>`).join('')}
     </tr>`).join('')}</tbody></table></div>`;
 }
 
@@ -280,7 +325,7 @@ function renderGrowth(d) {
     data: { labels, datasets },
     options: {
       maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-      scales: { y: moneyAxis({ beginAtZero: true }), x: { ...barAxis, ticks: { maxTicksLimit: 8 } } },
+      scales: { y: moneyAxis({ beginAtZero: true }), x: { ...barAxis, ticks: { maxTicksLimit: isNarrow() ? 4 : 8, maxRotation: 0, autoSkipPadding: 8 } } },
       plugins: { legend: legendOpts(), tooltip: moneyTip }
     }
   });
@@ -329,11 +374,12 @@ function renderAllocation(d) {
   });
 
   const buckets = Object.keys(PORTFOLIO_BUCKETS);
+  const SHORT_BUCKET = { 'Equity': 'Equity', 'Debt/Fixed Income': 'Debt', 'Cash/Gold': 'Cash & Gold' };
   const hasTargets = Object.keys(alloc).length && b.total > 0;
   if (hasTargets) queueChart('mix-chart', {
     type: 'bar',
     data: {
-      labels: buckets,
+      labels: buckets.map(k => isNarrow() ? SHORT_BUCKET[k] : k),
       datasets: [
         { label: 'You hold today', data: buckets.map(k => b[k] / b.total * 100),
           backgroundColor: '#0d9488', borderRadius: 6, maxBarThickness: 46 },
@@ -410,8 +456,18 @@ function renderCashflow(d) {
     },
     options: {
       indexAxis: 'y', maintainAspectRatio: false,
-      scales: { x: moneyAxis({ beginAtZero: true }), y: barAxis },
-      plugins: { legend: { display: false }, tooltip: moneyTip }
+      scales: {
+        x: moneyAxis({ beginAtZero: true }),
+        y: { ...barAxis, ticks: {
+          font: { size: isNarrow() ? 10 : 11 },
+          callback(v) {
+            const label = this.getLabelForValue(v);
+            return isNarrow() ? wrapLabel(label, 12) : shortLabel(label, 30);
+          }
+        } }
+      },
+      plugins: { legend: { display: false }, tooltip: {
+        callbacks: { title: items => items[0].label, label: ctx => ` ${money(ctx.parsed.x)}` } } }
     }
   });
 
@@ -526,6 +582,8 @@ function renderRisk(d) {
 
 // ── boot ──────────────────────────────────────────────────────────────────
 function render(d) {
+  lastData = d;
+  liveCharts.splice(0).forEach(c => c.destroy());
   document.getElementById('gate').classList.add('hidden');
   const app = document.getElementById('app');
   app.classList.remove('hidden');
@@ -541,6 +599,13 @@ function render(d) {
   ].join('');
   flushCharts();
 }
+
+let lastData = null, lastNarrow = isNarrow();
+addEventListener('resize', () => {
+  if (!lastData || isNarrow() === lastNarrow) return;
+  lastNarrow = isNarrow();
+  render(lastData);
+});
 
 function gateError(msg) {
   const el = document.getElementById('gate-error');
