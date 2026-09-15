@@ -7,6 +7,7 @@
   <meta name="description" content="Personalised financial planning and proactive wealth management. NISM Certified Investment Advisors, fee-only advisory." />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/jpeg" href="Assets/vrpf logo.jpg" />
@@ -287,14 +288,8 @@
           <h3 class="text-slate-900 font-semibold text-sm">Savings Allocation</h3>
           <span class="text-xs font-medium px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">Diversified</span>
         </div>
-        <canvas id="allocationChart" height="160"></canvas>
-        <div class="grid grid-cols-2 gap-1.5 mt-4">
-          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:#14b8a6"></span><span class="text-slate-500 text-xs">Equities</span><span class="text-slate-800 text-xs font-semibold ml-auto">40%</span></div>
-          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:#3b82f6"></span><span class="text-slate-500 text-xs">Debt</span><span class="text-slate-800 text-xs font-semibold ml-auto">25%</span></div>
-          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:#f59e0b"></span><span class="text-slate-500 text-xs">Gold</span><span class="text-slate-800 text-xs font-semibold ml-auto">15%</span></div>
-          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:#8b5cf6"></span><span class="text-slate-500 text-xs">Real Estate</span><span class="text-slate-800 text-xs font-semibold ml-auto">12%</span></div>
-          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:#94a3b8"></span><span class="text-slate-500 text-xs">Cash</span><span class="text-slate-800 text-xs font-semibold ml-auto">8%</span></div>
-        </div>
+        <canvas id="allocationChart" height="200"></canvas>
+        <p class="text-slate-400 text-xs mt-3 text-center">Recommended asset mix for balanced growth</p>
       </div>
 
       <!-- Radar Chart -->
@@ -548,6 +543,7 @@
   // ── CONTACT FORM ──
 
   // ── CHARTS ──
+  Chart.register(ChartDataLabels);
   window.addEventListener('load', () => {
     // Portfolio Growth
     new Chart(document.getElementById('growthChart'), {
@@ -559,7 +555,27 @@
           { label: 'No Investment', data: [100,103.5,107.1,110.9,114.8,118.9,123.1], borderColor: '#94a3b8', backgroundColor: 'rgba(148,163,184,0.06)', borderWidth: 2, borderDash: [5,5], fill: true, tension: 0.4, pointRadius: 3, pointBackgroundColor: '#94a3b8' },
         ]
       },
-      options: { responsive: true, plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ₹${ctx.raw}K` } } }, scales: { x: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 11 } } }, y: { display: false } } }
+      options: { 
+        layout: { padding: { right: 40 } },
+        aspectRatio: 1.1, 
+        responsive: true, 
+        plugins: { 
+          datalabels: { 
+            display: function(context) { return context.dataIndex === context.dataset.data.length - 1; },
+            align: 'right',
+            anchor: 'center',
+            formatter: function(value) { return '₹' + value + 'K'; },
+            font: { weight: 'bold', size: 10 },
+            color: function(context) { return context.dataset.borderColor; }
+          },
+          legend: { display: false }, 
+          tooltip: { enabled: false } 
+        }, 
+        scales: { 
+          x: { grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 11 } } }, 
+          y: { display: false } 
+        } 
+      }
     });
 
     // Allocation Donut
@@ -569,7 +585,15 @@
         labels: ['Equities','Debt','Gold','Real Estate','Cash'],
         datasets: [{ data: [40,25,15,12,8], backgroundColor: ['#14b8a6','#3b82f6','#f59e0b','#8b5cf6','#94a3b8'], borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }]
       },
-      options: { responsive: true, cutout: '60%', plugins: { legend: { display: false } } }
+      options: { 
+        responsive: true, 
+        cutout: '45%', 
+        plugins: { 
+          legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { size: 11 } } },
+          tooltip: { enabled: true },
+          datalabels: { display: false }
+        } 
+      }
     });
 
     // Radar
@@ -579,7 +603,7 @@
         labels: ['Growth','Safety','Liquidity','Tax Efficiency','Income','Diversification'],
         datasets: [{ label: 'Profile', data: [90,75,65,80,55,85], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.12)', borderWidth: 2, pointBackgroundColor: '#f59e0b', pointRadius: 4 }]
       },
-      options: { responsive: true, plugins: { legend: { display: false } }, scales: { r: { grid: { color: '#e2e8f0' }, angleLines: { color: '#e2e8f0' }, ticks: { display: false }, pointLabels: { color: '#94a3b8', font: { size: 10 } }, suggestedMin: 0, suggestedMax: 100 } } }
+      options: { responsive: true, plugins: { datalabels: { display: false }, legend: { display: false }, tooltip: { enabled: false } }, scales: { r: { grid: { color: '#e2e8f0' }, angleLines: { color: '#e2e8f0' }, ticks: { display: false }, pointLabels: { color: '#94a3b8', font: { size: 10 } }, suggestedMin: 0, suggestedMax: 100 } } }
     });
   });
 </script>
