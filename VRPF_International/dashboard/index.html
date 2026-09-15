@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Client Dashboard – VRPF</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { font-family: 'Inter', system-ui, sans-serif; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .fade-in { opacity: 0; transform: translateY(12px); animation: fadeInUp .5s ease forwards; }
+    @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+    .chart-box { position: relative; width: 100%; }
+    @media (max-width: 639px) {
+      table.stack, table.stack tbody, table.stack tr, table.stack td { display: block; width: 100%; }
+      table.stack thead { display: none; }
+      table.stack tr { padding: .6rem 0; border-bottom: 1px solid #f1f5f9; }
+      table.stack tr:last-child { border-bottom: 0; }
+      table.stack td { padding: .12rem 0 !important; text-align: left !important; }
+      table.stack td:empty { display: none; }
+      table.stack td:not(:first-child) { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+      table.stack td:not(:first-child)::before {
+        content: attr(data-label); flex: 0 0 auto;
+        color: #94a3b8; font-size: .7rem; font-weight: 600;
+        text-transform: uppercase; letter-spacing: .04em;
+      }
+      table.stack td:first-child { margin-bottom: .35rem; }
+    }
+    .chart-box > canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #fff; }
+      section { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased">
+
+<!-- ── NAV ── -->
+<nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-sm border-b border-slate-100">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+    <a href="https://vrpersonalfinance.in" class="flex items-center gap-2">
+      <img src="../Assets/vrpf logo.jpg" alt="VRPF" class="w-8 h-8 rounded-lg" />
+      <span class="font-bold text-lg">VRPF</span>
+      <span class="hidden sm:inline text-sm text-slate-400 font-medium border-l border-slate-200 pl-2 ml-1">Client Dashboard</span>
+    </a>
+    <div id="nav-meta" class="hidden items-center gap-3">
+      <span id="nav-code" class="text-sm font-semibold text-teal-700 bg-teal-50 border border-teal-200 px-3 py-1 rounded-full"></span>
+      <button onclick="window.print()" class="no-print hidden sm:inline-flex text-sm font-medium text-slate-500 hover:text-slate-900">Print</button>
+      <button onclick="signOut()" class="no-print text-sm font-medium text-slate-500 hover:text-slate-900">Exit</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── GATE ── -->
+<section id="gate" class="min-h-[85vh] flex items-center justify-center px-4 relative overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-br from-teal-50 via-white to-slate-50 -z-10"></div>
+  <div class="absolute top-0 right-0 w-[420px] h-[420px] bg-teal-100/40 rounded-full blur-3xl -z-10"></div>
+  <div class="w-full max-w-md bg-white rounded-2xl border border-slate-100 shadow-sm p-8 fade-in">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-xs font-medium mb-6">
+      <span class="w-2 h-2 rounded-full bg-teal-500"></span> Secure client access
+    </div>
+    <h1 class="text-2xl font-bold mb-2">Your financial plan</h1>
+    <p class="text-slate-500 text-sm mb-6 leading-relaxed">Enter the access code from your advisor's email. It opens only your own plan — nothing else.</p>
+    <form onsubmit="event.preventDefault(); openCode(document.getElementById('code-input').value);">
+      <label for="code-input" class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Access code</label>
+      <input id="code-input" autocomplete="off" spellcheck="false" placeholder="CC001-xxxxxxxxxx"
+             class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none text-sm mb-3" />
+      <p id="gate-error" class="hidden text-sm text-rose-600 mb-3"></p>
+      <button class="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-full font-semibold transition-colors shadow-lg" style="box-shadow:0 10px 30px rgba(20,184,166,.2)">
+        View my dashboard
+      </button>
+    </form>
+    <p class="text-xs text-slate-400 mt-6 leading-relaxed">Lost your code? Reply to your advisor's email and we'll resend it.</p>
+  </div>
+</section>
+
+<!-- ── DASHBOARD ── -->
+<main id="app" class="hidden max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10"></main>
+
+<footer id="footer" class="hidden border-t border-slate-100 bg-white mt-16">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-xs text-slate-400 leading-relaxed">
+    <p class="mb-2">This dashboard is prepared for a single VRPF client and reflects information as of the date shown. Figures are indicative and based on the details you shared with us; projections assume 6% inflation, 8% post-retirement returns and 10% pre-retirement returns.</p>
+    <p>© <span id="year"></span> VR Personal Finance · <a href="https://vrpersonalfinance.in/privacy-policy.html" class="hover:text-slate-600 underline">Privacy</a> · <a href="https://vrpersonalfinance.in/terms-and-conditions.html" class="hover:text-slate-600 underline">Terms</a></p>
+  </div>
+</footer>
+
+<script>
+// ── formatting ────────────────────────────────────────────────────────────
+const inr = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+const money = n => inr.format(Math.round(Number(n) || 0));
+const pct = n => (Number(n) * 100).toFixed(1) + '%';
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const compact = n => {
+  n = Number(n) || 0;
+  const a = Math.abs(n), sign = n < 0 ? '-' : '';
+  if (a >= 1e7) return sign + '₹' + (a / 1e7).toFixed(2) + ' Cr';
+  if (a >= 1e5) return sign + '₹' + (a / 1e5).toFixed(2) + ' L';
+  return money(n);
+};
+
+const PALETTE = ['#0d9488','#14b8a6','#2dd4bf','#5eead4','#0f766e','#0891b2','#38bdf8','#94a3b8','#f59e0b','#fb7185'];
+const BAND_STYLE = {
+  Conservative: 'bg-sky-50 text-sky-700 border-sky-200',
+  Moderate: 'bg-teal-50 text-teal-700 border-teal-200',
+  Growth: 'bg-amber-50 text-amber-700 border-amber-200',
+  Aggressive: 'bg-rose-50 text-rose-700 border-rose-200'
+};
+const PRIORITY_STYLE = {
+  High: 'bg-rose-50 text-rose-700 border-rose-200',
+  Medium: 'bg-amber-50 text-amber-700 border-amber-200',
+  Low: 'bg-slate-100 text-slate-600 border-slate-200'
+};
+
+// ── chart plumbing ────────────────────────────────────────────────────────
+Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#64748b';
+
+const pendingCharts = [], liveCharts = [];
+const queueChart = (id, config) => { pendingCharts.push([id, config]); return id; };
+function flushCharts() {
+  pendingCharts.splice(0).forEach(([id, config]) => {
+    const el = document.getElementById(id);
+    if (el) liveCharts.push(new Chart(el, config));
+  });
+  // Tailwind's CDN injects its stylesheet asynchronously, so the first measure can
+  // happen before card padding exists. Re-measure once the styles have landed.
+  const resizeAll = () => liveCharts.forEach(c => c.resize());
+  requestAnimationFrame(resizeAll);
+  setTimeout(resizeAll, 300);
+  window.addEventListener('load', resizeAll, { once: true });
+}
+addEventListener('beforeprint', () => liveCharts.forEach(c => c.resize()));
+
+const GRID = { color: '#f1f5f9', drawTicks: false };
+const tickMoney = v => {
+  const a = Math.abs(Number(v) || 0);
+  if (!isNarrow()) return compact(v);
+  if (a >= 1e7) return '₹' + (v / 1e7).toFixed(1) + 'Cr';
+  if (a >= 1e5) return '₹' + (v / 1e5).toFixed(1) + 'L';
+  if (a >= 1e3) return '₹' + Math.round(v / 1e3) + 'k';
+  return '₹' + Math.round(v);
+};
+const moneyAxis = (extra = {}) => ({
+  border: { display: false }, grid: GRID,
+  ticks: { callback: v => tickMoney(v), padding: 4, font: { size: isNarrow() ? 10 : 11 } }, ...extra
+});
+const barAxis = { border: { display: false }, grid: { display: false } };
+const moneyTip = { callbacks: { label: ctx => ` ${ctx.dataset.label ? ctx.dataset.label + ': ' : ''}${money(ctx.parsed.y ?? ctx.parsed.x ?? ctx.parsed)}` } };
+const isNarrow = () => window.innerWidth < 640;
+const legendOpts = (position = 'bottom') => ({
+  position: isNarrow() ? 'bottom' : position,
+  labels: {
+    boxWidth: 10, boxHeight: 10, usePointStyle: true, pointStyle: 'circle',
+    padding: isNarrow() ? 10 : 16, color: '#475569', font: { size: isNarrow() ? 10 : 11 }
+  }
+});
+const shortLabel = (v, max) => {
+  const s = String(v);
+  return s.length > max ? s.slice(0, max - 1).trimEnd() + '…' : s;
+};
+// Wrap a category name over two short lines rather than cutting it off.
+const wrapLabel = (v, width, maxLines = 2) => {
+  const lines = [];
+  String(v).split(' ').forEach(word => {
+    const last = lines[lines.length - 1];
+    if (last !== undefined && (last + ' ' + word).length <= width) lines[lines.length - 1] = last + ' ' + word;
+    else lines.push(word);
+  });
+  if (lines.length <= maxLines) return lines.map(l => shortLabel(l, width + 2));
+  const kept = lines.slice(0, maxLines);
+  kept[maxLines - 1] = shortLabel(kept[maxLines - 1] + ' ' + lines.slice(maxLines).join(' '), width);
+  return kept;
+};
+
+// Money that can actually be rebalanced: financial assets, not the house.
+const PORTFOLIO_BUCKETS = {
+  'Equity': ['Equity/Mutual Funds', 'REITs'],
+  'Debt/Fixed Income': ['Debt Mutual Funds', 'Fixed Deposits/Bonds', 'EPF, PPF, NPS'],
+  'Cash/Gold': ['Cash & Bank Balances', 'Gold/Precious Metals', 'Gold ETF']
+};
+
+function bucketTotals(d) {
+  const out = {}, byLabel = {};
+  d.balance.assets.forEach(a => { byLabel[a.label] = (byLabel[a.label] || 0) + a.amount; });
+  for (const [bucket, labels] of Object.entries(PORTFOLIO_BUCKETS))
+    out[bucket] = labels.reduce((t, l) => t + (byLabel[l] || 0), 0);
+  out.total = Object.values(out).reduce((a, b) => a + b, 0);
+  return out;
+}
+
+const bandMid = str => {
+  const nums = String(str).match(/\d+(\.\d+)?/g);
+  if (!nums) return 0;
+  return nums.reduce((a, n) => a + Number(n), 0) / nums.length / 100;
+};
+
+// Compound a lump sum plus a monthly investment, sampled once a year.
+function project(lump, monthly, years, rate) {
+  const r = rate / 12, out = [{ year: 0, value: lump }];
+  let bal = lump;
+  for (let y = 1; y <= years; y++) {
+    for (let m = 0; m < 12; m++) bal = bal * (1 + r) + monthly;
+    out.push({ year: y, value: bal });
+  }
+  return out;
+}
+
+// ── building blocks ───────────────────────────────────────────────────────
+const card = (inner, cls = '') =>
+  `<div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 ${cls}">${inner}</div>`;
+
+const section = (title, sub, inner) => `
+  <section class="fade-in">
+    <div class="mb-4">
+      <h2 class="text-xl font-bold">${esc(title)}</h2>
+      ${sub ? `<p class="text-sm text-slate-500 mt-1">${esc(sub)}</p>` : ''}
+    </div>
+    ${inner}
+  </section>`;
+
+const stat = (label, value, note, tone = 'slate') => card(`
+  <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">${esc(label)}</p>
+  <p class="text-2xl sm:text-3xl font-bold text-${tone}-900 mb-1 break-words">${value}</p>
+  ${note ? `<p class="text-sm text-slate-500">${esc(note)}</p>` : ''}`);
+
+function table(headers, rows, aligns = []) {
+  if (!rows.length) return '<p class="text-sm text-slate-400">Nothing recorded yet.</p>';
+  const al = i => aligns[i] === 'r' ? 'sm:text-right' : 'text-left';
+  const wide = headers.length > 3 ? 'sm:min-w-[520px]' : '';
+  return `<div class="sm:overflow-x-auto sm:-mx-6 sm:px-6"><table class="stack w-full text-sm ${wide}">
+    <thead><tr class="border-b border-slate-100">
+      ${headers.map((h, i) => `<th class="py-2 pr-4 text-xs font-semibold uppercase tracking-wide text-slate-400 ${al(i)}">${esc(h)}</th>`).join('')}
+    </tr></thead>
+    <tbody>${rows.map(r => `<tr class="border-b border-slate-50 last:border-0">
+      ${r.map((c, i) => `<td data-label="${esc(headers[i] || '')}" class="py-2.5 sm:pr-4 ${al(i)}">${c}</td>`).join('')}
+    </tr>`).join('')}</tbody></table></div>`;
+}
+
+const chip = (txt, cls) => `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${cls}">${esc(txt)}</span>`;
+
+// ── renderers ─────────────────────────────────────────────────────────────
+function renderSnapshot(d) {
+  const b = d.balance, c = d.cashflow;
+  const surplusTone = c.surplus >= 0 ? 'teal' : 'rose';
+  return `<section class="fade-in">
+    <div class="mb-4">
+      <h1 class="text-2xl sm:text-3xl font-bold">Your financial snapshot</h1>
+      <p class="text-sm text-slate-500 mt-1">Client ${esc(d.code)} · updated ${esc(d.updated || '')}</p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      ${stat('Net worth', compact(b.netWorth), `${money(b.totalAssets)} assets − ${money(b.totalLiabilities)} liabilities`)}
+      ${stat('Monthly surplus', compact(c.surplus), c.surplus >= 0 ? 'Available to invest each month' : 'Spending exceeds income', surplusTone)}
+      ${stat('Monthly income', compact(c.totalIncome), `${money(c.totalExpense)} monthly expenses`)}
+      ${stat('Risk profile', esc(d.risk.band || '—'), `Score ${d.risk.score} of ${d.risk.maxScore}`)}
+    </div>
+  </section>`;
+}
+
+function renderRetirement(d) {
+  const p = d.profile, r = d.retirement;
+  const years = Math.round(p.yearsToRetirement || 0);
+  const invested = bucketTotals(d).total;
+  const monthly = Math.max(d.cashflow.surplus, 0);
+  const needed = r.corpusNeeded || 0;
+
+  let projected = invested, gapCard = '';
+  if (years > 0) {
+    const series = project(invested, monthly, years, 0.10);
+    projected = series[series.length - 1].value;
+    const gap = projected - needed;
+    gapCard = stat(gap >= 0 ? 'Surplus at retirement' : 'Shortfall at retirement',
+      compact(Math.abs(gap)),
+      gap >= 0 ? 'Your current plan clears the target' : 'Extra you still need to build',
+      gap >= 0 ? 'teal' : 'rose');
+  }
+
+  return section('Retirement plan', `Age ${p.age || '—'} today, retiring at ${p.retirementAge || '—'}`, `
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      ${stat('Years to retirement', String(years), 'Time your money has to compound')}
+      ${stat('Corpus needed', compact(needed), 'To fund expenses to age 75')}
+      ${stat('Monthly saving needed', compact(r.monthlySavingNeeded), 'Starting now, at 10% p.a.')}
+      ${gapCard || stat('Investing today', compact(monthly), 'Your monthly surplus')}
+    </div>`);
+}
+
+function renderGrowth(d) {
+  const p = d.profile, r = d.retirement;
+  const years = Math.round(p.yearsToRetirement || 0);
+  if (years <= 0) return '';
+
+  const invested = bucketTotals(d).total;
+  const monthly = Math.max(d.cashflow.surplus, 0);
+  const recommended = Math.max(r.monthlySavingNeeded || 0, 0);
+  const needed = r.corpusNeeded || 0;
+  const startAge = Math.round(p.age || 0);
+
+  const current = project(invested, monthly, years, 0.10);
+  const advised = project(invested, recommended, years, 0.10);
+  const labels = current.map(x => startAge ? `Age ${startAge + x.year}` : `Year ${x.year}`);
+  const projected = current[current.length - 1].value;
+  const contributed = invested + monthly * 12 * years;
+
+  const line = (label, data, color, dash) => ({
+    label, data, borderColor: color, backgroundColor: color + '18',
+    borderWidth: 2.5, borderDash: dash || [], pointRadius: 0, pointHitRadius: 12,
+    tension: 0.25, fill: dash ? false : 'origin'
+  });
+
+  const datasets = [line('At your current pace', current.map(x => x.value), '#0d9488')];
+  if (recommended > monthly + 1)
+    datasets.push(line('At the recommended pace', advised.map(x => x.value), '#0891b2', [6, 4]));
+  if (needed > 0)
+    datasets.push(line('Corpus needed', labels.map(() => needed), '#f59e0b', [3, 4]));
+
+  queueChart('growth-chart', {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+      scales: { y: moneyAxis({ beginAtZero: true }), x: { ...barAxis, ticks: { maxTicksLimit: isNarrow() ? 4 : 8, maxRotation: 0, autoSkipPadding: 8 } } },
+      plugins: { legend: legendOpts(), tooltip: moneyTip }
+    }
+  });
+
+  return section('Where this plan takes you',
+    `Your money compounding at 10% a year until you are ${Math.round(p.retirementAge)}`, `
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      ${card(`<p class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-4">Projected corpus</p>
+        <div class="chart-box h-72 sm:h-80"><canvas id="growth-chart"></canvas></div>`, 'lg:col-span-2')}
+      <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-4">
+        ${stat('Corpus at retirement', compact(projected), 'If nothing about your plan changes')}
+        ${stat('You will have put in', compact(contributed), `${money(monthly)} a month for ${years} years`)}
+        ${stat('Growth on top', compact(Math.max(projected - contributed, 0)), 'Earned by compounding, not saved')}
+      </div>
+    </div>`);
+}
+
+function renderRatios(d) {
+  const rows = d.ratios.map(r => {
+    const v = r.unit === 'months' ? r.value.toFixed(1) + ' months' : pct(r.value);
+    return [`<span class="font-medium">${esc(r.label)}</span>`, v, esc(r.target),
+      chip(r.ok ? 'On track' : 'Needs attention', r.ok ? 'bg-teal-50 text-teal-700 border-teal-200' : 'bg-amber-50 text-amber-700 border-amber-200')];
+  });
+  return section('Financial health checks', 'How your numbers compare with healthy benchmarks',
+    card(table(['Ratio', 'Your value', 'Healthy range', 'Status'], rows)));
+}
+
+function renderAllocation(d) {
+  const assets = d.balance.assets.filter(a => a.amount > 0);
+  const alloc = d.risk.suggestedAllocation || {};
+  const b = bucketTotals(d);
+
+  if (assets.length) queueChart('alloc-chart', {
+    type: 'doughnut',
+    data: { labels: assets.map(a => a.label), datasets: [{
+      data: assets.map(a => a.amount), borderWidth: 2, borderColor: '#fff',
+      backgroundColor: assets.map((_, i) => PALETTE[i % PALETTE.length]) }] },
+    options: {
+      maintainAspectRatio: false, cutout: '62%',
+      plugins: {
+        legend: legendOpts('right'),
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${money(ctx.parsed)}` +
+          (d.balance.totalAssets ? ` (${pct(ctx.parsed / d.balance.totalAssets)})` : '') } }
+      }
+    }
+  });
+
+  const buckets = Object.keys(PORTFOLIO_BUCKETS);
+  const SHORT_BUCKET = { 'Equity': 'Equity', 'Debt/Fixed Income': 'Debt', 'Cash/Gold': 'Cash & Gold' };
+  const hasTargets = Object.keys(alloc).length && b.total > 0;
+  if (hasTargets) queueChart('mix-chart', {
+    type: 'bar',
+    data: {
+      labels: buckets.map(k => isNarrow() ? SHORT_BUCKET[k] : k),
+      datasets: [
+        { label: 'You hold today', data: buckets.map(k => b[k] / b.total * 100),
+          backgroundColor: '#0d9488', borderRadius: 6, maxBarThickness: 46 },
+        { label: `Suggested (${d.risk.band})`, data: buckets.map(k => bandMid(alloc[k]) * 100),
+          backgroundColor: '#99f6e4', borderRadius: 6, maxBarThickness: 46 }
+      ]
+    },
+    options: {
+      maintainAspectRatio: false,
+      scales: {
+        y: { beginAtZero: true, border: { display: false }, grid: GRID, ticks: { callback: v => v + '%' } },
+        x: barAxis
+      },
+      plugins: {
+        legend: legendOpts(),
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%` } }
+      }
+    }
+  });
+
+  const gapRows = hasTargets ? buckets.map(k => {
+    const now = b[k] / b.total, want = bandMid(alloc[k]), diff = want - now;
+    const move = diff * b.total;
+    const action = Math.abs(diff) < 0.02 ? '<span class="text-slate-400">On target</span>'
+      : diff > 0 ? `<span class="text-teal-700 font-medium">Add ${money(move)}</span>`
+                 : `<span class="text-rose-600 font-medium">Trim ${money(-move)}</span>`;
+    return [`<span class="font-medium">${esc(k)}</span>`, esc(alloc[k]), pct(now), action];
+  }) : [];
+
+  const right = hasTargets
+    ? `<div class="chart-box h-56 mb-5"><canvas id="mix-chart"></canvas></div>
+       ${table(['Asset class', 'Suggested', 'You hold', 'To reach target'], gapRows)}`
+    : '<p class="text-sm text-slate-400">Complete the risk questionnaire to see a suggested mix.</p>';
+
+  return section('Asset allocation', 'Where your money sits today, and where it should sit', `
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      ${card(`<p class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-4">Everything you own</p>
+        ${assets.length ? '<div class="chart-box h-64"><canvas id="alloc-chart"></canvas></div>'
+                        : '<p class="text-sm text-slate-400">No holdings recorded yet.</p>'}`)}
+      ${card(`<p class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1">Investable portfolio mix</p>
+        <p class="text-xs text-slate-400 mb-4">Financial assets only — your home and other assets are left out.</p>
+        ${right}`)}
+    </div>`);
+}
+
+function renderCashflow(d) {
+  const c = d.cashflow;
+  const inc = c.income.filter(i => i.amount);
+  const exp = c.expenses.filter(e => e.amount).slice().sort((a, b) => b.amount - a.amount);
+
+  queueChart('flow-chart', {
+    type: 'bar',
+    data: {
+      labels: ['Income', 'Expenses', c.surplus >= 0 ? 'Surplus' : 'Deficit'],
+      datasets: [{
+        data: [c.totalIncome, c.totalExpense, Math.abs(c.surplus)],
+        backgroundColor: ['#0d9488', '#fb7185', c.surplus >= 0 ? '#5eead4' : '#e11d48'],
+        borderRadius: 8, maxBarThickness: 64
+      }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      scales: { y: moneyAxis({ beginAtZero: true }), x: barAxis },
+      plugins: { legend: { display: false }, tooltip: moneyTip }
+    }
+  });
+
+  if (exp.length) queueChart('expense-chart', {
+    type: 'bar',
+    data: {
+      labels: exp.map(e => e.label),
+      datasets: [{ data: exp.map(e => e.amount), backgroundColor: '#fb7185',
+                   borderRadius: 6, maxBarThickness: 22 }]
+    },
+    options: {
+      indexAxis: 'y', maintainAspectRatio: false,
+      scales: {
+        x: moneyAxis({ beginAtZero: true }),
+        y: { ...barAxis, ticks: {
+          font: { size: isNarrow() ? 10 : 11 },
+          callback(v) {
+            const label = this.getLabelForValue(v);
+            return isNarrow() ? wrapLabel(label, 12) : shortLabel(label, 30);
+          }
+        } }
+      },
+      plugins: { legend: { display: false }, tooltip: {
+        callbacks: { title: items => items[0].label, label: ctx => ` ${money(ctx.parsed.x)}` } } }
+    }
+  });
+
+  const list = (items, total, label, tone) => `
+    <div class="flex items-baseline justify-between mb-4">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">${label}</p>
+      <p class="text-lg font-bold text-${tone}-700">${money(total)}</p>
+    </div>
+    ${items.length ? `<div class="space-y-2">${items.map(i => `
+      <div class="flex items-center justify-between text-sm">
+        <span class="text-slate-600">${esc(i.label)}</span>
+        <span class="font-medium tabular-nums">${money(i.amount)}</span>
+      </div>
+      <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        <div class="h-full bg-${tone}-500 rounded-full" style="width:${total ? Math.min(100, i.amount / total * 100) : 0}%"></div>
+      </div>`).join('')}</div>` : '<p class="text-sm text-slate-400">Nothing recorded yet.</p>'}`;
+
+  return section('Monthly cash flow', `${c.surplus >= 0 ? 'You save' : 'You overspend by'} ${money(Math.abs(c.surplus))} every month`, `
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      ${card(`<p class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-4">Income vs expenses</p>
+        <div class="chart-box h-64"><canvas id="flow-chart"></canvas></div>`)}
+      ${card(`<p class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-4">Where your money goes</p>
+        ${exp.length ? `<div class="chart-box" style="height:${Math.max(180, exp.length * 34)}px"><canvas id="expense-chart"></canvas></div>`
+                     : '<p class="text-sm text-slate-400">No expenses recorded yet.</p>'}`)}
+      ${card(list(inc, c.totalIncome, 'Income', 'teal'))}
+      ${card(list(exp, c.totalExpense, 'Expenses', 'rose'))}
+    </div>`);
+}
+
+function renderBalance(d) {
+  const b = d.balance;
+  const assets = b.assets.filter(a => a.amount);
+  const liabs = b.liabilities.filter(l => l.amount);
+
+  if (assets.length || liabs.length) queueChart('networth-chart', {
+    type: 'bar',
+    data: {
+      labels: ['Assets', 'Liabilities'],
+      datasets: [
+        ...assets.map((a, i) => ({ label: a.label, data: [a.amount, 0],
+          backgroundColor: PALETTE[i % PALETTE.length], stack: 's', borderRadius: 3, maxBarThickness: 54 })),
+        ...liabs.map((l, i) => ({ label: l.label, data: [0, l.amount],
+          backgroundColor: ['#fb7185', '#f43f5e', '#e11d48', '#be123c', '#9f1239'][i % 5], stack: 's', borderRadius: 3, maxBarThickness: 54 }))
+      ]
+    },
+    options: {
+      indexAxis: 'y', maintainAspectRatio: false,
+      scales: { x: { stacked: true, ...moneyAxis({ beginAtZero: true }) }, y: { stacked: true, ...barAxis } },
+      plugins: {
+        legend: legendOpts(),
+        tooltip: { filter: ctx => ctx.parsed.x > 0, callbacks: { label: ctx => ` ${ctx.dataset.label}: ${money(ctx.parsed.x)}` } }
+      }
+    }
+  });
+
+  const assetRows = assets.map(a => [
+    `<span class="font-medium">${esc(a.label)}</span>`,
+    a.bucket ? chip(a.bucket, 'bg-slate-100 text-slate-600 border-slate-200') : '',
+    money(a.amount)]);
+  const liabRows = liabs.map(l => [
+    `<span class="font-medium">${esc(l.label)}</span>`,
+    l.monthly ? money(l.monthly) : '—',
+    money(l.amount)]);
+
+  return section('Assets & liabilities', `Net worth ${money(b.netWorth)}`, `
+    <div class="space-y-4">
+      ${card(`<p class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-4">What you own, against what you owe</p>
+        <div class="chart-box h-64"><canvas id="networth-chart"></canvas></div>`)}
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        ${card(`<div class="flex items-baseline justify-between mb-4">
+          <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Assets</p>
+          <p class="text-lg font-bold text-teal-700">${money(b.totalAssets)}</p></div>
+          ${table(['Asset', 'Type', 'Value'], assetRows, ['', '', 'r'])}`)}
+        ${card(`<div class="flex items-baseline justify-between mb-4">
+          <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Liabilities</p>
+          <p class="text-lg font-bold text-rose-700">${money(b.totalLiabilities)}</p></div>
+          ${table(['Liability', 'Monthly', 'Outstanding'], liabRows, ['', 'r', 'r'])}`)}
+      </div>
+    </div>`);
+}
+
+function renderActions(d) {
+  if (!d.actions.length) return '';
+  const rows = d.actions.map(a => [
+    a.priority ? chip(a.priority, PRIORITY_STYLE[a.priority] || PRIORITY_STYLE.Low) : '',
+    `<span class="font-medium">${esc(a.category)}</span>`,
+    esc(a.timeline || '—'),
+    `<span class="text-slate-600">${esc(a.details || '—')}</span>`,
+    a.amount ? money(a.amount) : '—']);
+  return section('Your action plan', 'Agreed next steps, in priority order',
+    card(table(['Priority', 'Focus', 'Timeline', 'What to do', 'Amount'], rows, ['', '', '', '', 'r'])));
+}
+
+function renderRisk(d) {
+  const qs = d.risk.questions.filter(q => q.question);
+  if (!qs.length) return '';
+  const bandCls = BAND_STYLE[d.risk.band] || 'bg-slate-100 text-slate-600 border-slate-200';
+  return section('Risk profile', 'Based on the questionnaire you completed with your advisor', card(`
+    <div class="flex flex-wrap items-center gap-3 mb-6">
+      ${chip(d.risk.band || 'Not assessed', bandCls)}
+      <span class="text-sm text-slate-500">Score ${d.risk.score} of ${d.risk.maxScore}</span>
+      <div class="flex-1 min-w-[140px] h-2 bg-slate-100 rounded-full overflow-hidden">
+        <div class="h-full bg-teal-500 rounded-full" style="width:${d.risk.score / d.risk.maxScore * 100}%"></div>
+      </div>
+    </div>
+    <div class="space-y-3">${qs.map(q => `
+      <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 pb-3 border-b border-slate-50 last:border-0">
+        <span class="text-sm text-slate-600">${esc(q.question)}</span>
+        <span class="text-sm font-medium whitespace-nowrap">${esc(q.answer || '—')}</span>
+      </div>`).join('')}</div>`));
+}
+
+// ── boot ──────────────────────────────────────────────────────────────────
+function render(d) {
+  lastData = d;
+  liveCharts.splice(0).forEach(c => c.destroy());
+  document.getElementById('gate').classList.add('hidden');
+  const app = document.getElementById('app');
+  app.classList.remove('hidden');
+  document.getElementById('footer').classList.remove('hidden');
+  document.getElementById('nav-meta').classList.remove('hidden');
+  document.getElementById('nav-meta').classList.add('flex');
+  document.getElementById('nav-code').textContent = d.code;
+  document.title = `${d.code} · VRPF Dashboard`;
+  app.innerHTML = [
+    renderSnapshot(d), renderRetirement(d), renderGrowth(d), renderRatios(d),
+    renderAllocation(d), renderCashflow(d), renderBalance(d), renderActions(d),
+    renderRisk(d)
+  ].join('');
+  flushCharts();
+}
+
+let lastData = null, lastNarrow = isNarrow();
+addEventListener('resize', () => {
+  if (!lastData || isNarrow() === lastNarrow) return;
+  lastNarrow = isNarrow();
+  render(lastData);
+});
+
+function gateError(msg) {
+  const el = document.getElementById('gate-error');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+async function openCode(codeRaw, quiet) {
+  const code = String(codeRaw || '').trim();
+  if (!code) return gateError('Please enter your access code.');
+  if (!/^[A-Za-z0-9_-]{3,64}$/.test(code)) return gateError('That code does not look right. Check the email from your advisor.');
+  try {
+    const res = await fetch(`d/${code}.json`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('not found');
+    const data = await res.json();
+    localStorage.setItem('vrpf_code', code);
+    history.replaceState(null, '', `?k=${encodeURIComponent(code)}`);
+    render(data);
+  } catch (e) {
+    localStorage.removeItem('vrpf_code');
+    if (!quiet) gateError('We could not find a dashboard for that code. Please check it and try again.');
+  }
+}
+
+function signOut() {
+  localStorage.removeItem('vrpf_code');
+  history.replaceState(null, '', location.pathname);
+  location.reload();
+}
+
+document.getElementById('year').textContent = new Date().getFullYear();
+(function init() {
+  const fromUrl = new URLSearchParams(location.search).get('k');
+  const saved = localStorage.getItem('vrpf_code');
+  if (fromUrl) openCode(fromUrl);
+  else if (saved) openCode(saved, true);
+})();
+</script>
+</body>
+</html>
