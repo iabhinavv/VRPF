@@ -9,7 +9,9 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/jpeg" href="Assets/vrpf logo.jpg" />
   <style>
+    html, body { overflow-x: hidden; }
     * { font-family: 'Inter', system-ui, sans-serif; }
     html { scroll-behavior: smooth; }
     ::-webkit-scrollbar { width: 8px; }
@@ -35,6 +37,36 @@
     .prose p, .prose li { color: #475569; }
     .prose ul { list-style-type: disc; padding-left: 1.5rem; }
     .prose strong { font-weight: 600; color: #1e293b; }
+
+    /* Paint Mix Background Effects */
+    .paint-mix-section {
+      position: relative;
+      z-index: 1;
+    }
+    .paint-mix-bg {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background: 
+        radial-gradient(circle at 15% 20%, rgba(204, 251, 241, 0.7) 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(186, 230, 253, 0.7) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(224, 231, 255, 0.5) 0%, transparent 65%);
+      filter: blur(40px);
+      opacity: 0.9;
+      pointer-events: none;
+      mask-image: linear-gradient(to bottom, transparent, black 150px, black calc(100% - 150px), transparent);
+      -webkit-mask-image: linear-gradient(to bottom, transparent, black 150px, black calc(100% - 150px), transparent);
+    }
+    .paint-mix-noise {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      opacity: 0.12;
+      pointer-events: none;
+      mask-image: linear-gradient(to bottom, transparent, black 150px, black calc(100% - 150px), transparent);
+      -webkit-mask-image: linear-gradient(to bottom, transparent, black 150px, black calc(100% - 150px), transparent);
+    }
   </style>
 </head>
 <body class="bg-white text-slate-900 antialiased">
@@ -138,8 +170,10 @@
 </section>
 
 <!-- ── SERVICES ── -->
-<section id="services" class="py-24 bg-slate-50">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<section id="services" class="py-24 paint-mix-section">
+  <div class="paint-mix-bg"></div>
+  <div class="paint-mix-noise"></div>
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
     <div class="text-center mb-16 fade-in">
       <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-sm font-medium mb-5">
         <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>What We Offer
@@ -277,8 +311,10 @@
 </section>
 
 <!-- ── TESTIMONIALS ── -->
-<section id="testimonials" class="py-24 bg-slate-50">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<section id="testimonials" class="py-24 paint-mix-section">
+  <div class="paint-mix-bg"></div>
+  <div class="paint-mix-noise"></div>
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
     <div class="text-center mb-16 fade-in">
       <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-sm font-medium mb-5">
         <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>Client Stories
@@ -347,16 +383,16 @@
 </section>
 
 <!-- ── CTA BANNER ── -->
-<section class="relative py-28 overflow-hidden bg-slate-900">
-  <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(19,78,74,0.5) 0%,transparent 60%)"></div>
-  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full blur-3xl" style="background:rgba(20,184,166,0.1)"></div>
+<section class="py-28 paint-mix-section">
+  <div class="paint-mix-bg"></div>
+  <div class="paint-mix-noise"></div>
   <div class="relative z-10 text-center max-w-3xl mx-auto px-4">
-    <p class="text-teal-400 text-sm font-semibold tracking-widest uppercase mb-4">Start Your Journey</p>
-    <h2 class="text-4xl sm:text-5xl font-bold text-white mb-6 leading-tight">
-      Ready to go from <span class="text-teal-400">0 investments</span> to creating generational wealth?
+    <p class="text-teal-700 text-sm font-semibold tracking-widest uppercase mb-4">Start Your Journey</p>
+    <h2 class="text-4xl sm:text-5xl font-bold text-slate-900 mb-6 leading-tight">
+      Ready to go from <span class="text-teal-600">0 investments</span> to creating generational wealth?
     </h2>
-    <p class="text-slate-400 text-lg mb-10 max-w-xl mx-auto">Book your free consultation today and take the first step toward financial freedom.</p>
-    <a href="https://calendly.com/vrpersonalfinance/book-a-call-with-our-consultant" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-teal-500 hover:bg-teal-400 text-white px-10 py-4 rounded-full font-bold transition-all text-lg" style="box-shadow:0 20px 40px rgba(0,0,0,0.3)">
+    <p class="text-slate-600 text-lg mb-10 max-w-xl mx-auto">Book your free consultation today and take the first step toward financial freedom.</p>
+    <a href="https://calendly.com/vrpersonalfinance/book-a-call-with-our-consultant" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-10 py-4 rounded-full font-bold transition-all text-lg shadow-lg" style="box-shadow:0 10px 30px rgba(20,184,166,0.2)">
       Book a Call
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
     </a>
