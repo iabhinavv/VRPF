@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+
+# AI answer engines are welcome to read and cite these pages.
+User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+Sitemap: https://vrpersonalfinance.in/sitemap.xml
