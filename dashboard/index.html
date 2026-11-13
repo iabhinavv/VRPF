@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
+  <meta name="referrer" content="no-referrer" />
   <title>Client Dashboard – VRPF</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -53,31 +54,28 @@
     <div id="nav-meta" class="hidden items-center gap-3">
       <span id="nav-code" class="text-sm font-semibold text-teal-700 bg-teal-50 border border-teal-200 px-3 py-1 rounded-full"></span>
       <button onclick="window.print()" class="no-print hidden sm:inline-flex text-sm font-medium text-slate-500 hover:text-slate-900">Print</button>
-      <button onclick="signOut()" class="no-print text-sm font-medium text-slate-500 hover:text-slate-900">Exit</button>
+      <span id="nav-expiry" class="hidden sm:inline text-xs text-slate-400"></span>
     </div>
   </div>
 </nav>
 
-<!-- ── GATE ── -->
+<!-- ── GATE / STATUS ── -->
 <section id="gate" class="min-h-[85vh] flex items-center justify-center px-4 relative overflow-hidden">
   <div class="absolute inset-0 bg-gradient-to-br from-teal-50 via-white to-slate-50 -z-10"></div>
   <div class="absolute top-0 right-0 w-[420px] h-[420px] bg-teal-100/40 rounded-full blur-3xl -z-10"></div>
   <div class="w-full max-w-md bg-white rounded-2xl border border-slate-100 shadow-sm p-8 fade-in">
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-xs font-medium mb-6">
-      <span class="w-2 h-2 rounded-full bg-teal-500"></span> Secure client access
+    <div id="gate-badge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-xs font-medium mb-6">
+      <span class="w-2 h-2 rounded-full bg-teal-500"></span> <span id="gate-badge-text">Private client link</span>
     </div>
-    <h1 class="text-2xl font-bold mb-2">Your financial plan</h1>
-    <p class="text-slate-500 text-sm mb-6 leading-relaxed">Enter the access code from your advisor's email. It opens only your own plan — nothing else.</p>
-    <form onsubmit="event.preventDefault(); openCode(document.getElementById('code-input').value);">
-      <label for="code-input" class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Access code</label>
-      <input id="code-input" autocomplete="off" spellcheck="false" placeholder="CC001-xxxxxxxxxx"
-             class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none text-sm mb-3" />
-      <p id="gate-error" class="hidden text-sm text-rose-600 mb-3"></p>
-      <button class="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-full font-semibold transition-colors shadow-lg" style="box-shadow:0 10px 30px rgba(20,184,166,.2)">
-        View my dashboard
-      </button>
-    </form>
-    <p class="text-xs text-slate-400 mt-6 leading-relaxed">Lost your code? Reply to your advisor's email and we'll resend it.</p>
+    <h1 id="gate-title" class="text-2xl font-bold mb-2">Opening your plan…</h1>
+    <p id="gate-msg" class="text-slate-500 text-sm mb-6 leading-relaxed">One moment.</p>
+    <div id="gate-help" class="hidden text-sm text-slate-500 leading-relaxed border-t border-slate-100 pt-5">
+      <p class="mb-3">Ask your advisor for a fresh link — they are issued monthly and expire for your security.</p>
+      <p class="mb-0">
+        <a href="mailto:vrpersonalfinance@gmail.com" class="text-teal-700 font-medium hover:text-teal-600">vrpersonalfinance@gmail.com</a><br />
+        <a href="tel:+919056005257" class="text-teal-700 font-medium hover:text-teal-600">+91 90560 05257</a>
+      </p>
+    </div>
   </div>
 </section>
 
@@ -581,8 +579,9 @@ function renderRisk(d) {
 }
 
 // ── boot ──────────────────────────────────────────────────────────────────
-function render(d) {
+function render(d, meta) {
   lastData = d;
+  if (meta) lastMeta = meta;
   liveCharts.splice(0).forEach(c => c.destroy());
   document.getElementById('gate').classList.add('hidden');
   const app = document.getElementById('app');
@@ -591,6 +590,11 @@ function render(d) {
   document.getElementById('nav-meta').classList.remove('hidden');
   document.getElementById('nav-meta').classList.add('flex');
   document.getElementById('nav-code').textContent = d.code;
+  const exp = document.getElementById('nav-expiry');
+  if (exp && lastMeta && lastMeta.expires_at) {
+    const when = new Date(lastMeta.expires_at);
+    exp.textContent = 'Link expires ' + when.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+  }
   document.title = `${d.code} · VRPF Dashboard`;
   app.innerHTML = [
     renderSnapshot(d), renderRetirement(d), renderGrowth(d), renderRatios(d),
@@ -600,48 +604,74 @@ function render(d) {
   flushCharts();
 }
 
-let lastData = null, lastNarrow = isNarrow();
+let lastData = null, lastMeta = null, lastNarrow = isNarrow();
 addEventListener('resize', () => {
   if (!lastData || isNarrow() === lastNarrow) return;
   lastNarrow = isNarrow();
-  render(lastData);
+  render(lastData, lastMeta);
 });
 
-function gateError(msg) {
-  const el = document.getElementById('gate-error');
-  el.textContent = msg;
-  el.classList.remove('hidden');
+// ── data access ───────────────────────────────────────────────────────────
+// The publishable key is meant to be public. It grants nothing on its own:
+// every table denies anonymous access, and get_plan() returns a plan only for
+// a token that exists, is unrevoked and has not expired.
+const SUPABASE_URL = 'https://ysqwiqrmyueoklptvvgo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_K_BHM7w3YTqiiMIeT144fg__lq64xDf';
+
+const GATE = {
+  loading: { badge: 'Private client link', title: 'Opening your plan…', msg: 'One moment.', help: false, tone: 'teal' },
+  nolink:  { badge: 'Private client link', title: 'This page needs your private link',
+             msg: 'Your dashboard opens from the link your advisor emails you each month. Open that link directly rather than this page.', help: true, tone: 'teal' },
+  expired: { badge: 'Link expired', title: 'This link has expired',
+             msg: 'Dashboard links are deliberately short-lived. Your plan is safe — it just needs a fresh link.', help: true, tone: 'amber' },
+  invalid: { badge: 'Link not recognised', title: 'We could not open this link',
+             msg: 'The link may have been changed in transit, replaced by a newer one, or copied incompletely. Try clicking it directly from the email.', help: true, tone: 'amber' },
+  error:   { badge: 'Connection problem', title: 'We could not reach your plan',
+             msg: 'Something went wrong on the way to the server. Check your connection and try again in a moment.', help: true, tone: 'amber' }
+};
+
+function showGate(state) {
+  const g = GATE[state] || GATE.error;
+  const badge = document.getElementById('gate-badge');
+  document.getElementById('gate-badge-text').textContent = g.badge;
+  badge.className = 'inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium mb-6 border ' +
+    (g.tone === 'amber' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-teal-50 border-teal-200 text-teal-700');
+  badge.querySelector('span').className = 'w-2 h-2 rounded-full ' + (g.tone === 'amber' ? 'bg-amber-500' : 'bg-teal-500');
+  document.getElementById('gate-title').textContent = g.title;
+  document.getElementById('gate-msg').textContent = g.msg;
+  document.getElementById('gate-help').classList.toggle('hidden', !g.help);
+  document.getElementById('gate').classList.remove('hidden');
+  document.getElementById('app').classList.add('hidden');
 }
 
-async function openCode(codeRaw, quiet) {
-  const code = String(codeRaw || '').trim();
-  if (!code) return gateError('Please enter your access code.');
-  if (!/^[A-Za-z0-9_-]{3,64}$/.test(code)) return gateError('That code does not look right. Check the email from your advisor.');
+async function loadPlan(token) {
+  showGate('loading');
   try {
-    const res = await fetch(`d/${code}.json`, { cache: 'no-store' });
-    if (!res.ok) throw new Error('not found');
-    const data = await res.json();
-    localStorage.setItem('vrpf_code', code);
-    history.replaceState(null, '', `?k=${encodeURIComponent(code)}`);
-    render(data);
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_plan`, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ link_token: token }),
+      cache: 'no-store'
+    });
+    if (!res.ok) return showGate('error');
+    const body = await res.json();
+    if (!body || body.error) return showGate(body && body.error === 'expired' ? 'expired' : 'invalid');
+    if (!body.plan) return showGate('invalid');
+    render(body.plan, body);
   } catch (e) {
-    localStorage.removeItem('vrpf_code');
-    if (!quiet) gateError('We could not find a dashboard for that code. Please check it and try again.');
+    showGate('error');
   }
-}
-
-function signOut() {
-  localStorage.removeItem('vrpf_code');
-  history.replaceState(null, '', location.pathname);
-  location.reload();
 }
 
 document.getElementById('year').textContent = new Date().getFullYear();
 (function init() {
-  const fromUrl = new URLSearchParams(location.search).get('k');
-  const saved = localStorage.getItem('vrpf_code');
-  if (fromUrl) openCode(fromUrl);
-  else if (saved) openCode(saved, true);
+  const token = new URLSearchParams(location.search).get('t');
+  if (token && /^[a-f0-9]{32,80}$/i.test(token)) loadPlan(token);
+  else showGate('nolink');
 })();
 </script>
 </body>

@@ -1,0 +1,26 @@
+# Supabase free-tier projects pause after 7 days with no API requests.
+# Clients open their dashboard roughly once a month, which is not often enough.
+# This pings the project daily so it never sleeps.
+#
+# No secrets needed: the publishable key is public by design, and the call sends
+# a deliberately invalid token, so it reads nothing and returns {"error":"invalid"}.
+name: Keep Supabase awake
+
+on:
+  schedule:
+    - cron: "17 6 * * *"   # 06:17 UTC daily
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase
+        run: |
+          curl -sS -X POST \
+            "https://ysqwiqrmyueoklptvvgo.supabase.co/rest/v1/rpc/get_plan" \
+            -H "apikey: sb_publishable_K_BHM7w3YTqiiMIeT144fg__lq64xDf" \
+            -H "Authorization: Bearer sb_publishable_K_BHM7w3YTqiiMIeT144fg__lq64xDf" \
+            -H "Content-Type: application/json" \
+            -d '{"link_token":"keepalive-not-a-real-token"}' \
+            --fail-with-body -o /dev/null -w "pinged, HTTP %{http_code}\n"
